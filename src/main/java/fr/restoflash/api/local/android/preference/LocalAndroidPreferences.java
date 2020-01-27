@@ -9,6 +9,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.Expose;
 
+import java.lang.reflect.Modifier;
+
 import fr.restoflash.api.platform.sync.SyncPolicy;
 
 
@@ -28,25 +30,28 @@ public class LocalAndroidPreferences {
 
     */
 
-    SyncPolicy.SyncRule ruleForQr = SyncPolicy.SyncRule.BACKGROUND;
-    SyncPolicy.SyncRule ruleForCheckoutList = SyncPolicy.SyncRule.FOREGROUND;
+    @Expose
+    public SyncPolicy.SyncRule ruleForQr ;
+    @Expose
+    public SyncPolicy.SyncRule ruleForCheckoutList;
 
 
-    @Expose(serialize = false, deserialize = false)
-    SharedPreferences preferences;
+       @Expose(serialize = false, deserialize = false)
+       Context appContext;
+
 
 
 
 
     protected LocalAndroidPreferences()
     {
-        this.ruleForQr= SyncPolicy.SyncRule.BACKGROUND;
-        this.ruleForCheckoutList = SyncPolicy.SyncRule.FOREGROUND;
+
 
     }
 
     public static LocalAndroidPreferences getPreferences(Context context)
     {
+
 
         SharedPreferences preferences = context.getSharedPreferences(preferenceID,Context.MODE_PRIVATE);
         if(preferences.contains(optionsID))
@@ -54,13 +59,30 @@ public class LocalAndroidPreferences {
             String json = preferences.getString(optionsID, null);
             if(json!=null)
             {
-                return  new GsonBuilder()
+                LocalAndroidPreferences instance =   new GsonBuilder()
                         .excludeFieldsWithoutExposeAnnotation()
+                        .excludeFieldsWithModifiers(Modifier.STATIC)
+                        .excludeFieldsWithModifiers(Modifier.PRIVATE)
                         .create().fromJson(json, LocalAndroidPreferences.class);
+                instance.appContext = context.getApplicationContext();
+                boolean shouldSave=false;
+                if(instance.ruleForQr==null) {
+                    instance.ruleForQr = SyncPolicy.SyncRule.BACKGROUND;
+                    shouldSave=true;
+                }
+                if(instance.ruleForCheckoutList==null){
+                    instance.ruleForCheckoutList=SyncPolicy.SyncRule.FOREGROUND;
+                    shouldSave=true;}
+                if(shouldSave)
+                     instance.save();
+                return instance;
             }
         }
         LocalAndroidPreferences instance =  new LocalAndroidPreferences();
-        instance.preferences = preferences;
+        instance.ruleForQr= SyncPolicy.SyncRule.BACKGROUND;
+        instance.ruleForCheckoutList = SyncPolicy.SyncRule.FOREGROUND;
+        instance.appContext = context;
+     //   instance.preferences = preferences;
         instance.save();
         return instance;
 
@@ -68,7 +90,13 @@ public class LocalAndroidPreferences {
 
     public void save()
     {
-        preferences.edit().putString(optionsID, new Gson().toJson(this, LocalAndroidPreferences.class)).commit();
+        String json = new GsonBuilder()
+                .excludeFieldsWithoutExposeAnnotation()
+                .excludeFieldsWithModifiers(Modifier.STATIC)
+                .excludeFieldsWithModifiers(Modifier.PRIVATE)
+                .create().toJson(this, LocalAndroidPreferences.class);
+
+        getSharedPreferences().edit().putString(optionsID, json).commit();
     }
 
     public SyncPolicy.SyncRule getRuleForQr() {
@@ -89,13 +117,17 @@ public class LocalAndroidPreferences {
         save();
     }
 
-
-
-    public SharedPreferences getPreferences() {
-        return preferences;
+    private SharedPreferences getSharedPreferences()
+    {
+        return appContext.getSharedPreferences(preferenceID,Context.MODE_PRIVATE);
     }
 
-    public void setPreferences(SharedPreferences preferences) {
-        this.preferences = preferences;
+    public static SyncPolicy.SyncRule toSyncRule (String name) {
+        try {
+            return SyncPolicy.SyncRule.valueOf(name);
+        } catch (Exception ex) {
+            // For error cases
+            return SyncPolicy.SyncRule.FOREGROUND;
+        }
     }
 }

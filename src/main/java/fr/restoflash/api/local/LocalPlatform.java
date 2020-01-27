@@ -5,7 +5,7 @@ import android.content.Context;
 import fr.restoflash.api.local.android.platform.serializer.AndroidSQLPaymentSerializer;
 import fr.restoflash.api.local.android.preference.LocalAndroidPreferences;
 import fr.restoflash.api.model.Checkout;
-import fr.restoflash.api.model.Configuration;
+import fr.restoflash.api.ConfigurationCore;
 import fr.restoflash.api.model.QrCode;
 import fr.restoflash.api.model.TokenType;
 import fr.restoflash.api.model.interfaces.PaymentInterface;
@@ -28,7 +28,7 @@ public class LocalPlatform implements fr.restoflash.api.platform.LocalPlatform {
 
         SyncPolicy strategy = new SyncPolicy() {
             @Override
-            public SyncRule ruleForPayment(PaymentInterface payment, Configuration currentConfig) {
+            public SyncRule ruleForPayment(PaymentInterface payment, ConfigurationCore currentConfig) {
 
                 if (payment.getTokenType() == TokenType.QRCODE) {
                     boolean bonRepas = false;

@@ -98,6 +98,8 @@ public class RestoFlashService extends Service {
 
     public static void syncAutomatically(Context context, boolean syncAutomatically) {
         createDummyAccount(context);
+        if(syncAutomatically)
+            ContentResolver.setMasterSyncAutomatically(true);
         ContentResolver.setSyncAutomatically(dummyAccount, SerializablePaymentContentProvider.AUTHORITY, syncAutomatically);
     }
 

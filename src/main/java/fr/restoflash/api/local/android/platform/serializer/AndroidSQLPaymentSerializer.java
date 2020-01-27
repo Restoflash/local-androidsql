@@ -26,12 +26,16 @@ import fr.restoflash.api.platform.serializer.PaymentsSerializer;
 public class AndroidSQLPaymentSerializer implements PaymentsSerializer {
     final static boolean DEV_MODE = true;
     final Context context;
-    final SQLiteManager sqliteManager;
+    SQLiteManager sqliteManager;
     ContentObserver contentObserver=null;
+    final String dbName ;
+    final boolean devMode;
 
     public AndroidSQLPaymentSerializer(Context androidContext, String dbName, boolean devMode) {
         this.context = androidContext;
-        sqliteManager = new SQLiteManager(context, dbName, devMode);
+        this.dbName = dbName;
+        this.devMode = devMode;
+
     }
     public AndroidSQLPaymentSerializer(Context androidContext, String dbName) {
         this(androidContext,dbName,DEV_MODE);
@@ -134,8 +138,17 @@ public class AndroidSQLPaymentSerializer implements PaymentsSerializer {
     }
 
     @Override
-    public void cleanUp() {
+    public void initialize() {
+        sqliteManager = new SQLiteManager(context, dbName, devMode);
+    }
 
+    @Override
+    public void cleanUp() {
+        if(sqliteManager!=null)
+        {
+            sqliteManager.closeDb();
+            sqliteManager=null;
+        }
     }
 
     public ContentObserver getContentObserver() {

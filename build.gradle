@@ -11,6 +11,7 @@ buildscript {
 
     }
     dependencies {
+        classpath 'com.android.tools.build:gradle:3.5.3'
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.0'
         classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.0.1"
         classpath 'digital.wup:android-maven-publish:3.0.0'
@@ -46,35 +47,19 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation project(':core')
-    implementation project(':platform-android')
+    api project(':core')
+    api project(':platform-android')
     implementation 'com.android.support:appcompat-v7:28.0.0'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 }
 
-artifactory {
-    contextUrl = 'http://dsi.restoflash.fr:8081/artifactory'
-    publish {
-        repository {
-            String repo = version.endsWith('SNAPSHOT') ? 'libs-snapshot-local' : 'libs-release-local'
 
-            repoKey = repo
-            username = 'alex'
-            password = 'AP2hgTZ2kYRvwt9X17xu9V1b5V4'
-        }
-        defaults {
-            publications('maven')
-            publishArtifacts = true
-            publishPom = true
-        }
-    }
-}
 publishing {
     publications {
         maven(MavenPublication) {
-            groupId 'fr.restoflash.api.local'
+            groupId  'fr.restoflash.api.local'
             version version
             from components.android
             artifactId 'androidsql'

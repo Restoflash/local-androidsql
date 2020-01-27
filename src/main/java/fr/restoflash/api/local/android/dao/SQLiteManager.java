@@ -22,6 +22,7 @@ public class SQLiteManager {
 
 
     private final DaoSession daoSession;
+    private  DaoMaster.OpenHelper helper;
     final Query<SerializablePayment> selectAllPaymentsQuery;
     final Query<SerializablePayment> selectUnconfirmedPaymentsQuery;
     final Query<SerializablePayment> selectUnsyncedPaymentsQuery;
@@ -37,7 +38,7 @@ public class SQLiteManager {
     public SQLiteManager(Context context, String dbName, boolean devMode)
     {
         this.context = context;
-        DaoMaster.OpenHelper helper = null;
+        helper = null;
         if(devMode)
         {
             helper = new DaoMaster.DevOpenHelper(context, dbName,null);
@@ -150,5 +151,12 @@ public class SQLiteManager {
 
     public Query<SerializablePayment> getSelectAllPaymentsQuery() {
         return selectAllPaymentsQuery;
+    }
+
+
+    public void closeDb()
+    {
+        helper.close();
+        daoSession.clear();
     }
 }
