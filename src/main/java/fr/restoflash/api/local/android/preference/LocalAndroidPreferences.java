@@ -11,6 +11,7 @@ import com.google.gson.annotations.Expose;
 
 import java.lang.reflect.Modifier;
 
+import fr.restoflash.api.local.android.sync.RestoFlashService;
 import fr.restoflash.api.platform.sync.SyncPolicy;
 
 
@@ -84,6 +85,7 @@ public class LocalAndroidPreferences {
         instance.appContext = context;
      //   instance.preferences = preferences;
         instance.save();
+        instance.configureSync(context);
         return instance;
 
     }
@@ -105,6 +107,7 @@ public class LocalAndroidPreferences {
 
     public void setRuleForQr(SyncPolicy.SyncRule ruleForQr) {
         this.ruleForQr = ruleForQr;
+        configureSync(appContext);
         save();
     }
 
@@ -114,6 +117,7 @@ public class LocalAndroidPreferences {
 
     public void setRuleForCheckoutList(SyncPolicy.SyncRule ruleForCheckoutList) {
         this.ruleForCheckoutList = ruleForCheckoutList;
+        configureSync(appContext);
         save();
     }
 
@@ -128,6 +132,18 @@ public class LocalAndroidPreferences {
         } catch (Exception ex) {
             // For error cases
             return SyncPolicy.SyncRule.FOREGROUND;
+        }
+    }
+
+    protected void configureSync(Context context)
+    {
+        if(ruleForQr!= SyncPolicy.SyncRule.FOREGROUND && ruleForCheckoutList!= SyncPolicy.SyncRule.FOREGROUND)
+        {
+            RestoFlashService.syncAutomatically(context, true);
+        }
+        else
+        {
+            RestoFlashService.syncAutomatically(context, false);
         }
     }
 }

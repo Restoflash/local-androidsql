@@ -15,6 +15,8 @@ import android.util.Log;
 import fr.restoflash.api.RestoFlashApi;
 import fr.restoflash.api.RestoFlashApiCore;
 import fr.restoflash.api.exception.RequestFailedException;
+import fr.restoflash.api.model.RestoflashStatus;
+import fr.restoflash.api.model.Status;
 
 /**
  * Created by Alex on 26/04/2018.
@@ -46,18 +48,15 @@ public class RestoflashSyncAdapter extends AbstractThreadedSyncAdapter {
 
         RestoFlashApi api = RestoFlashApi.getInstance();
         Log.i("RestoFlashService", "onPerformSync");
-        if(api==null )
+        if(api==null || api.getStatus().getStatus()!= Status.INITIALIZED )
         {
             Log.i("RestoFlashService", "Resto Flash not initialized do nothing");
-         //   EventBus.getDefault().post(new RestoFlash.SyncEventStart());
-//            EventBus.getDefault().post(new RestoFlash.SyncEventStop());
             return;
         }
-      //  EventBus.getDefault().post(new RestoFlash.SyncEventStart());
 
         if(api.unsyncedPaymentCount()==0)
         {
-          //  EventBus.getDefault().post(new RestoFlash.SyncEventStop());
+            Log.i("RestoFlashService", "nothing to syncrhonize");
             return;
         }
         Log.i("RestoFlashService", "**** sync started ****");
@@ -66,11 +65,20 @@ public class RestoflashSyncAdapter extends AbstractThreadedSyncAdapter {
             Log.i("RestoFlashService", "**** sync finished ****");
         } catch (RequestFailedException e) {
             e.printStackTrace();
+            RestoFlashService.syncPeriodically(getContext());
         }
         catch (Exception other)
         {
             other.printStackTrace();
             Log.i("RestoFlashService", "**** sync error  :" + other.getLocalizedMessage() + "****");
+        }
+        if(api.unsyncedPaymentCount()>0)
+        {
+            RestoFlashService.syncPeriodically(getContext());
+        }
+        else
+        {
+            RestoFlashService.removePeriodicSync(getContext());
         }
 
     }

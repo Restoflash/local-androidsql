@@ -97,10 +97,16 @@ public class RestoFlashService extends Service {
     }
 
     public static void syncAutomatically(Context context, boolean syncAutomatically) {
-        createDummyAccount(context);
-        if(syncAutomatically)
-            ContentResolver.setMasterSyncAutomatically(true);
-        ContentResolver.setSyncAutomatically(dummyAccount, SerializablePaymentContentProvider.AUTHORITY, syncAutomatically);
+        try {
+            createDummyAccount(context);
+            if (syncAutomatically)
+                ContentResolver.setMasterSyncAutomatically(true);
+            ContentResolver.setSyncAutomatically(dummyAccount, SerializablePaymentContentProvider.AUTHORITY, syncAutomatically);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     }
 
     public static boolean isSyncAutomatically(Context context) {
@@ -116,35 +122,60 @@ public class RestoFlashService extends Service {
     }
 
 
-    public static void syncPeriodically(Context context, boolean syncPeriodically, long periodInSeconds)
+    public static void syncPeriodically(Context context)//, boolean syncPeriodically, long periodInSeconds)
     {
-        createDummyAccount(context);
-        ContentResolver.removePeriodicSync(dummyAccount,SerializablePaymentContentProvider.AUTHORITY,  Bundle.EMPTY);
+        try {
+            createDummyAccount(context);
+            ContentResolver.removePeriodicSync(dummyAccount, SerializablePaymentContentProvider.AUTHORITY, Bundle.EMPTY);
 
-        if(syncPeriodically) {
+            // if(syncPeriodically) {
 
             ContentResolver.addPeriodicSync(
                     dummyAccount,
                     SerializablePaymentContentProvider.AUTHORITY,
                     Bundle.EMPTY,
-                    periodInSeconds);
+                    60 * 15);
+            // }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
         }
 
     }
 
+    public static void removePeriodicSync(Context context)//, boolean syncPeriodically, long periodInSeconds)
+    {
+        try {
+            createDummyAccount(context);
+            ContentResolver.removePeriodicSync(dummyAccount, SerializablePaymentContentProvider.AUTHORITY, Bundle.EMPTY);
+
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
     public static void requestSync(Context context)
     {
-        // Pass the settings flags by inserting them in a bundle
-        Bundle settingsBundle = new Bundle();
-        settingsBundle.putBoolean(
-                ContentResolver.SYNC_EXTRAS_MANUAL, true);
-        settingsBundle.putBoolean(
-                ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
-        /*
-         * Request the sync for the default account, authority, and
-         * manual sync settings
-         */
-        ContentResolver.requestSync(dummyAccount, SerializablePaymentContentProvider.AUTHORITY, settingsBundle);
+        try {
+            // Pass the settings flags by inserting them in a bundle
+            Bundle settingsBundle = new Bundle();
+            settingsBundle.putBoolean(
+                    ContentResolver.SYNC_EXTRAS_MANUAL, true);
+            settingsBundle.putBoolean(
+                    ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
+            /*
+             * Request the sync for the default account, authority, and
+             * manual sync settings
+             */
+            ContentResolver.requestSync(dummyAccount, SerializablePaymentContentProvider.AUTHORITY, settingsBundle);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     }
 
 
