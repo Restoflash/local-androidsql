@@ -46,39 +46,37 @@ public class RestoflashSyncAdapter extends AbstractThreadedSyncAdapter {
     @Override
     public void onPerformSync(Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult) {
 
-        RestoFlashApi api = RestoFlashApi.getInstance();
-        Log.i("RestoFlashService", "onPerformSync");
-        if(api==null || api.getStatus().getStatus()!= Status.INITIALIZED )
-        {
-            Log.i("RestoFlashService", "Resto Flash not initialized do nothing");
-            return;
-        }
-
-        if(api.unsyncedPaymentCount()==0)
-        {
-            Log.i("RestoFlashService", "nothing to syncrhonize");
-            return;
-        }
-        Log.i("RestoFlashService", "**** sync started ****");
         try {
-            api.batchSync();
-            Log.i("RestoFlashService", "**** sync finished ****");
-        } catch (RequestFailedException e) {
-            e.printStackTrace();
-            RestoFlashService.syncPeriodically(getContext());
+            RestoFlashApi api = RestoFlashApi.getInstance();
+            Log.i("RestoFlashService", "onPerformSync");
+            if (api == null || api.getStatus().getStatus() != Status.INITIALIZED) {
+                Log.i("RestoFlashService", "Resto Flash not initialized do nothing");
+                return;
+            }
+
+            if (api.unsyncedPaymentCount() == 0) {
+                Log.i("RestoFlashService", "nothing to syncrhonize");
+                return;
+            }
+            Log.i("RestoFlashService", "**** sync started ****");
+            try {
+                api.batchSync();
+                Log.i("RestoFlashService", "**** sync finished ****");
+            } catch (RequestFailedException e) {
+                e.printStackTrace();
+                RestoFlashService.syncPeriodically(getContext());
+            } catch (Exception other) {
+                other.printStackTrace();
+                Log.i("RestoFlashService", "**** sync error  :" + other.getLocalizedMessage() + "****");
+            }
+            if (api.unsyncedPaymentCount() > 0) {
+                RestoFlashService.syncPeriodically(getContext());
+            } else {
+                RestoFlashService.removePeriodicSync(getContext());
+            }
         }
-        catch (Exception other)
+        catch (Exception e)
         {
-            other.printStackTrace();
-            Log.i("RestoFlashService", "**** sync error  :" + other.getLocalizedMessage() + "****");
-        }
-        if(api.unsyncedPaymentCount()>0)
-        {
-            RestoFlashService.syncPeriodically(getContext());
-        }
-        else
-        {
-            RestoFlashService.removePeriodicSync(getContext());
         }
 
     }

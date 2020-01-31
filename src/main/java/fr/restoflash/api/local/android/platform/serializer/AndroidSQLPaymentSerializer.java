@@ -3,7 +3,9 @@ package fr.restoflash.api.local.android.platform.serializer;
 import android.content.Context;
 import android.database.ContentObservable;
 import android.database.ContentObserver;
+import android.database.sqlite.SQLiteDatabase;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -149,6 +151,13 @@ public class AndroidSQLPaymentSerializer implements PaymentsSerializer {
             sqliteManager.closeDb();
             sqliteManager=null;
         }
+    }
+
+    @Override
+    public File getLogs() {
+        SQLiteDatabase db = sqliteManager.getReadableDatabase();
+        File fileDb = new File(db.getPath());
+        return fileDb;
     }
 
     public ContentObserver getContentObserver() {

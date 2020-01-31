@@ -159,4 +159,9 @@ public class SQLiteManager {
         helper.close();
         daoSession.clear();
     }
+    public SQLiteDatabase getReadableDatabase()
+    {
+        return helper.getReadableDatabase();
+    }
+
 }

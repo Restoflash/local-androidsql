@@ -137,7 +137,7 @@ public class LocalAndroidPreferences {
 
     protected void configureSync(Context context)
     {
-        if(ruleForQr!= SyncPolicy.SyncRule.FOREGROUND && ruleForCheckoutList!= SyncPolicy.SyncRule.FOREGROUND)
+        if(ruleForQr!= SyncPolicy.SyncRule.FOREGROUND || ruleForCheckoutList!= SyncPolicy.SyncRule.FOREGROUND)
         {
             RestoFlashService.syncAutomatically(context, true);
         }
@@ -146,4 +146,7 @@ public class LocalAndroidPreferences {
             RestoFlashService.syncAutomatically(context, false);
         }
     }
+
+
+
 }
