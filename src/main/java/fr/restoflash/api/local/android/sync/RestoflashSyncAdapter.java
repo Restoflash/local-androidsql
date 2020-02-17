@@ -13,9 +13,7 @@ import android.os.Bundle;
 import android.util.Log;
 
 import fr.restoflash.api.RestoFlashApi;
-import fr.restoflash.api.RestoFlashApiCore;
 import fr.restoflash.api.exception.RequestFailedException;
-import fr.restoflash.api.model.RestoflashStatus;
 import fr.restoflash.api.model.Status;
 
 /**
@@ -49,7 +47,7 @@ public class RestoflashSyncAdapter extends AbstractThreadedSyncAdapter {
         try {
             RestoFlashApi api = RestoFlashApi.getInstance();
             Log.i("RestoFlashService", "onPerformSync");
-            if (api == null || api.getStatus().getStatus() != Status.INITIALIZED) {
+            if (api == null || api.getStatus().getValue() != Status.INITIALIZED) {
                 Log.i("RestoFlashService", "Resto Flash not initialized do nothing");
                 return;
             }
